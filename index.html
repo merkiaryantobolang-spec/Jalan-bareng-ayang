@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jalan Jalan Bersama Pacarku</title>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:linear-gradient(to bottom,#6ec6ff,#fef6e4);
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+max-width:1300px;
+margin:auto;
+}
+
+.title{
+text-align:center;
+font-size:42px;
+margin-bottom:25px;
+color:white;
+text-shadow:2px 2px 10px rgba(0,0,0,0.2);
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:25px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card h2{
+margin-bottom:15px;
+color:#ff7b54;
+}
+
+.item{
+background:#f8f9fa;
+padding:15px;
+border-radius:15px;
+margin-bottom:15px;
+}
+
+.expense-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;
+font-weight:bold;
+}
+
+.expense-content{
+display:none;
+margin-top:15px;
+}
+
+.expense-content.active{
+display:block;
+}
+
+.check-item{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:10px;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:10px;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+background:#2a9d8f;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.result{
+margin-top:10px;
+font-weight:bold;
+}
+
+.progress-bar{
+width:100%;
+height:25px;
+background:#ddd;
+border-radius:20px;
+overflow:hidden;
+margin-top:10px;
+}
+
+.progress{
+height:100%;
+width:0%;
+background:#2a9d8f;
+transition:0.3s;
+}
+
+.total-box{
+margin-top:20px;
+padding:15px;
+background:#fff3cd;
+border-radius:15px;
+font-weight:bold;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+color:white;
+font-weight:bold;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+font-weight:bold;
+font-size:20px;
+color:#ff7b54;
+text-shadow:1px 1px 5px rgba(0,0,0,0.2);
+}
+
+.footer-name{
+color:#ff9800;
+font-size:18px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1 class="title">🌴 Jalan Jalan Bersama Pacarku 🌊</h1>
+
+<div class="grid">
+
+<div class="card">
+<h2>✅ Checklist Trip</h2>
+
+<div class="check-item"><input type="checkbox" class="task"> Berangkat dari Solo</div>
+<div class="check-item"><input type="checkbox" class="task"> Sampai Pantai</div>
+<div class="check-item"><input type="checkbox" class="task"> Makan Malam</div>
+<div class="check-item"><input type="checkbox" class="task"> Check In Penginapan</div>
+<div class="check-item"><input type="checkbox" class="task"> Istirahat</div>
+<div class="check-item"><input type="checkbox" class="task"> Jalan Pagi</div>
+<div class="check-item"><input type="checkbox" class="task"> Belanja Untuk Masak</div>
+<div class="check-item"><input type="checkbox" class="task"> Istirahat</div>
+<div class="check-item"><input type="checkbox" class="task"> Makan siang Masak</div>
+<div class="check-item"><input type="checkbox" class="task"> Jalan Jalan Sore ke Coffe</div>
+<div class="check-item"><input type="checkbox" class="task"> Makan Malam</div>
+<div class="check-item"><input type="checkbox" class="task"> Istirahat</div>
+<div class="check-item"><input type="checkbox" class="task"> Masak Untuk Sarapan</div>
+<div class="check-item"><input type="checkbox" class="task"> Prepare Pulang ke Solo</div>
+
+<div class="progress-bar">
+<div class="progress" id="progress"></div>
+</div>
+<p id="progressText">0% selesai</p>
+</div>
+
+<div class="card">
+<h2>🏖️ Pantai Tujuan</h2>
+
+<label><b>Pilih Pantai Tujuan</b></label>
+<select id="pantaiSelect" onchange="showPantai()">
+<option value="">-- Pilih Pantai --</option>
+<option value="midodaren">Pantai Midodaren</option>
+<option value="ngluwen">Pantai Ngluwen</option>
+<option value="wediombo">Pantai Wediombo</option>
+</select>
+
+<div id="pantaiDetail"></div>
+</div>
+
+<div class="card">
+<h2>☕ Tempat Makan & Ngopi</h2>
+
+<div id="dynamicExpense"></div>
+
+<button onclick="addExpense()" style="background:#ff7b54;">
+➕ Tambah Tempat Makan / Ngopi
+</button>
+</div>
+
+<div class="card">
+<h2>💰 Budget penginapan dan Transportasi</h2>
+
+<div class="item">
+<div class="expense-header" onclick="toggleExpense('budgetPenginapan')">
+<span>🏠 Penginapan</span>
+<span>▼</span>
+</div>
+
+<div class="expense-content" id="budgetPenginapan">
+<label>Target Budget</label>
+<input type="number" id="penginapanTarget" value="">
+
+<label>Pengeluaran Real</label>
+<input type="number" id="penginapanActual" placeholder="Isi pengeluaran aktual">
+
+<button onclick="calculateBudget('penginapanTarget','penginapanActual','penginapanResult')">Hitung</button>
+<p class="result" id="penginapanResult"></p>
+</div>
+</div>
+
+<div class="item">
+<div class="expense-header" onclick="toggleExpense('budgetBensin')">
+<span>⛽ Bensin</span>
+<span>▼</span>
+</div>
+
+<div class="expense-content" id="budgetBensin">
+<label>Target Budget</label>
+<input type="number" id="bensinTarget" value="">
+
+<label>Pengeluaran Real</label>
+<input type="number" id="bensinActual" placeholder="Isi pengeluaran aktual">
+
+<button onclick="calculateBudget('bensinTarget','bensinActual','bensinResult')">Hitung</button>
+<p class="result" id="bensinResult"></p>
+</div>
+</div>
+
+
+
+<div class="total-box">
+🌟 ini juga memiliki kemungkinan lebih lemat atau over Budget.
+</div>
+</div>
+
+<div class="card">
+<h2>🛒 Belanja & Jajanan</h2>
+
+<div id="shoppingContainer"></div>
+
+<button onclick="addShoppingItem()" style="background:#ff7b54;">
+➕ Tambah Belanja / Jajanan
+</button>
+
+<div class="total-box">
+🧃 Tambahkan snack, BBQ, minuman, kebutuhan masak, atau jajanan trip lainnya di sini.
+</div>
+</div>
+
+<div class="card">
+<h2>📋 Ringkasan Perjalanan dan Budget</h2>
+
+<div class="total-box" id="summaryBox" style="line-height:1.9;background:linear-gradient(to right,#fff8e1,#ffffff);font-size:15px;">
+✨ Ringkasan trip akan muncul di sini setelah tombol ditekan.
+</div>
+
+<button onclick="generateSummary()" style="margin-top:15px;background:#ff7b54;">
+Buat Ringkasan Trip
+</button>
+</div>
+
+<button onclick="resetAllData()" style="
+margin-top:10px;
+background:#e63946;
+">
+🗑️ Reset Semua Data
+</button>
+
+</div>
+
+<div class="footer">
+✨ Special for You Ayu Wulandari Kekasihku ✨ <br>
+<span class="footer-name">by Merki Aryanto</span>
+</div>
+</div>
+
+<script>
+const tasks = document.querySelectorAll('.task');
+const progress = document.getElementById('progress');
+const progressText = document.getElementById('progressText');
+
+tasks.forEach(task=>{
+task.addEventListener('change',updateProgress);
+});
+
+function updateProgress(){
+const checked=document.querySelectorAll('.task:checked').length;
+const total=tasks.length;
+const percent=Math.round((checked/total)*100);
+
+progress.style.width=percent+'%';
+progressText.innerText=percent+'% selesai';
+}
+
+function generateSummary(){
+const penginapan=document.getElementById('penginapanActual').value || 0;
+const bensin=document.getElementById('bensinActual').value || 0;
+let shoppingTotal = 0;
+
+const shoppingActuals = document.querySelectorAll('.shopping-actual');
+shoppingActuals.forEach(item=>{
+shoppingTotal += parseInt(item.value) || 0;
+});
+
+const pantaiInput = document.getElementById('pantaiActual');
+const pantaiBudget = pantaiInput ? pantaiInput.value : 0;
+const selectedPantai=document.getElementById('pantaiSelect').options[document.getElementById('pantaiSelect').selectedIndex].text;
+
+let dynamicTotal = 0;
+
+const dynamicActuals = document.querySelectorAll('.dynamic-actual');
+dynamicActuals.forEach(item=>{
+dynamicTotal += parseInt(item.value) || 0;
+});
+
+const total =
+parseInt(penginapan)+
+parseInt(bensin)+
+parseInt(shoppingTotal)+
+parseInt(pantaiBudget)+
+parseInt(dynamicTotal);
+
+const summary=document.getElementById('summaryBox');
+
+const checked=document.querySelectorAll('.task:checked').length;
+const totalTask=document.querySelectorAll('.task').length;
+const progressPercent=Math.round((checked/totalTask)*100);
+
+const durasiInput = document.querySelector('#pantaiDetail input[type="number"]');
+const selectedPantaiDurasi = durasiInput ? durasiInput.value : '-';
+
+const makanItems=[...document.querySelectorAll('#dynamicExpense .expense-header span:first-child')]
+.map(item=>item.innerText)
+.filter(item=>!item.includes('Tempat Baru'));
+
+const belanjaItems=[...document.querySelectorAll('#shoppingContainer .expense-header span:first-child')]
+.map(item=>item.innerText)
+.filter(item=>!item.includes('Belanja Baru'));
+
+summary.innerHTML=`
+<div style="font-size:22px;margin-bottom:15px;color:#ff7b54;">
+🌴 RINGKASAN TRIP 3D2N 🌊
+</div>
+
+<div style="padding:15px;background:white;border-radius:15px;margin-bottom:15px;">
+<b>📌 Progress Trip</b><br>
+${progressPercent}% checklist selesai
+</div>
+
+<div style="padding:15px;background:white;border-radius:15px;margin-bottom:15px;">
+<b>🏖️ Pantai Tujuan</b><br>
+${selectedPantai}<br>
+⏳ Durasi Main : ${selectedPantaiDurasi} jam
+</div>
+
+<div style="padding:15px;background:white;border-radius:15px;margin-bottom:15px;">
+<b>☕ Tempat Ngopi & Makan</b><br>
+${makanItems.length>0 ? makanItems.join('<br>') : 'Belum ada tempat dipilih'}
+</div>
+
+<div style="padding:15px;background:white;border-radius:15px;margin-bottom:15px;">
+<b>🛒 Belanja & Jajanan</b><br>
+${belanjaItems.length>0 ? belanjaItems.join('<br>') : 'Belum ada belanja ditambahkan'}
+</div>
+
+<div style="padding:15px;background:white;border-radius:15px;margin-bottom:15px;">
+<b>💰 Rincian Budget</b><br>
+🏠 Penginapan : Rp ${parseInt(penginapan).toLocaleString('id-ID')}<br>
+⛽ Bensin : Rp ${parseInt(bensin).toLocaleString('id-ID')}<br>
+☕🍜 Ngopi & Makan : Rp ${parseInt(dynamicTotal).toLocaleString('id-ID')}<br>
+🛒 Belanja : Rp ${parseInt(shoppingTotal).toLocaleString('id-ID')}<br>
+🏖️ Pantai : Rp ${parseInt(pantaiBudget).toLocaleString('id-ID')}
+</div>
+
+<div style="padding:18px;background:linear-gradient(to right,#ffecd2,#fcb69f);border-radius:18px;font-size:22px;text-align:center;font-weight:bold;color:#333;">
+💸 TOTAL TRIP : Rp ${total.toLocaleString('id-ID')}
+</div>
+`;
+}
+
+function showPantai(){
+const value=document.getElementById('pantaiSelect').value;
+const detail=document.getElementById('pantaiDetail');
+
+if(value==='midodaren'){
+detail.innerHTML=`
+<div class="item">
+<b>🏖️ Pantai Midodaren</b><br>
+Waktu Tempuh : 1 jam 28 menit<br><br>
+
+<label>Durasi di Pantai (jam)</label>
+<input type="number" value="2">
+
+<label>Target Budget</label>
+<input type="number" id="pantaiTarget" value="">
+
+<label>Pengeluaran Aktual</label>
+<input type="number" id="pantaiActual" placeholder="Isi sendiri">
+
+<button onclick="calculateBudget('pantaiTarget','pantaiActual','pantaiResult')">Hitung</button>
+<p class="result" id="pantaiResult"></p>
+</div>`;
+}
+
+else if(value==='ngluwen'){
+detail.innerHTML=`
+<div class="item">
+<b>🏖️ Pantai Ngluwen</b><br>
+Waktu Tempuh : 1 jam 16 menit<br><br>
+
+<label>Durasi di Pantai (jam)</label>
+<input type="number" value="3">
+
+<label>Target Budget</label>
+<input type="number" id="pantaiTarget" value="">
+
+<label>Pengeluaran Aktual</label>
+<input type="number" id="pantaiActual" placeholder="Isi sendiri">
+
+<button onclick="calculateBudget('pantaiTarget','pantaiActual','pantaiResult')">Hitung</button>
+<p class="result" id="pantaiResult"></p>
+</div>`;
+}
+
+else if(value==='wediombo'){
+detail.innerHTML=`
+<div class="item">
+<b>🏖️ Pantai Wediombo 🌅</b><br>
+Sunset Favorite<br>
+Waktu Tempuh : 1 jam 46 menit<br><br>
+
+<label>Durasi di Pantai (jam)</label>
+<input type="number" value="4">
+
+<label>Target Budget</label>
+<input type="number" id="pantaiTarget" value="">
+
+<label>Pengeluaran Aktual</label>
+<input type="number" id="pantaiActual" placeholder="Isi sendiri">
+
+<button onclick="calculateBudget('pantaiTarget','pantaiActual','pantaiResult')">Hitung</button>
+<p class="result" id="pantaiResult"></p>
+</div>`;
+}
+
+else{
+detail.innerHTML='';
+}
+}
+
+let expenseCount = 0;
+let shoppingCount = 0;
+
+function addExpense(){
+expenseCount++;
+
+const container=document.getElementById('dynamicExpense');
+
+const html=`
+<div class="item">
+<div class="expense-header" onclick="toggleExpense('expenseContent${expenseCount}')">
+<span id="expenseTitle${expenseCount}">🍴 Tempat Baru</span>
+<span>▼</span>
+</div>
+
+<div class="expense-content" id="expenseContent${expenseCount}">
+<label><b>Nama Tempat</b></label>
+<input type="text" placeholder="Contoh: Kopi Senja / Seafood Pantai" oninput="updateExpenseTitle(${expenseCount}, this.value)">
+
+<label>Jenis</label>
+<select>
+<option>Ngopi</option>
+<option>Makan</option>
+<option>Jajanan</option>
+<option>Lainnya</option>
+</select>
+
+<label>Target Budget</label>
+<input type="number" id="dynamicTarget${expenseCount}" value="">
+
+<label>Pengeluaran Aktual</label>
+<input type="number" class="dynamic-actual" id="dynamicActual${expenseCount}" placeholder="Isi pengeluaran aktual">
+
+<button onclick="calculateBudget('dynamicTarget${expenseCount}','dynamicActual${expenseCount}','dynamicResult${expenseCount}')">
+Hitung
+</button>
+
+<p class="result" id="dynamicResult${expenseCount}"></p>
+</div>
+</div>`;
+
+container.innerHTML += html;
+}
+
+function addShoppingItem(){
+shoppingCount++;
+
+const container=document.getElementById('shoppingContainer');
+
+const html=`
+<div class="item">
+<div class="expense-header" onclick="toggleExpense('shoppingContent${shoppingCount}')">
+<span id="shoppingTitle${shoppingCount}">🛒 Belanja Baru</span>
+<span>▼</span>
+</div>
+
+<div class="expense-content" id="shoppingContent${shoppingCount}">
+<label><b>Nama Belanja / Jajanan</b></label>
+<input type="text" placeholder="Contoh: BBQ, Snack, Air Mineral" oninput="updateShoppingTitle(${shoppingCount}, this.value)">
+
+<label>Jenis</label>
+<select>
+<option>Belanja Masakan</option>
+<option>Snack</option>
+<option>Minuman</option>
+<option>Jajanan</option>
+<option>Lainnya</option>
+</select>
+
+<label>Target Budget</label>
+<input type="number" id="shoppingTarget${shoppingCount}" value="">
+
+<label>Pengeluaran Aktual</label>
+<input type="number" class="shopping-actual" id="shoppingActual${shoppingCount}" placeholder="Isi pengeluaran aktual">
+
+<button onclick="calculateBudget('shoppingTarget${shoppingCount}','shoppingActual${shoppingCount}','shoppingResult${shoppingCount}')">
+Hitung
+</button>
+
+<p class="result" id="shoppingResult${shoppingCount}"></p>
+</div>
+</div>`;
+
+container.innerHTML += html;
+}
+
+function updateShoppingTitle(id,value){
+const title=document.getElementById('shoppingTitle'+id);
+
+if(value.trim()===''){
+title.innerHTML='🛒 Belanja Baru';
+}
+else{
+title.innerHTML='🛒 '+value;
+}
+}
+
+function updateExpenseTitle(id,value){
+const title=document.getElementById('expenseTitle'+id);
+
+if(value.trim()===''){
+title.innerHTML='🍴 Tempat Baru';
+}
+else{
+title.innerHTML='🍴 '+value;
+}
+}
+
+function toggleExpense(id){
+const content=document.getElementById(id);
+content.classList.toggle('active');
+}
+
+function calculateBudget(targetId,actualId,resultId){
+const target=parseInt(document.getElementById(targetId).value)||0;
+const actual=parseInt(document.getElementById(actualId).value)||0;
+const diff=actual-target;
+
+const result=document.getElementById(resultId);
+
+if(actual===0){
+result.innerHTML='⚠️ Isi pengeluaran aktual terlebih dahulu';
+result.style.color='#ff9800';
+}
+else if(diff>0){
+result.innerHTML='💸 Over Budget Rp'+diff.toLocaleString('id-ID');
+result.style.color='#e63946';
+}
+else if(diff<0){
+result.innerHTML='✅ Hemat Rp'+Math.abs(diff).toLocaleString('id-ID');
+result.style.color='#2a9d8f';
+}
+else{
+result.innerHTML='✅ Budget Pas';
+result.style.color='#2a9d8f';
+}
+// ===============================
+// AUTO SAVE SEMUA INPUT
+// ===============================
+
+function saveData(){
+const allInputs=document.querySelectorAll('input, select');
+
+allInputs.forEach((item,index)=>{
+localStorage.setItem('trip_'+index,item.value);
+
+if(item.type==='checkbox'){
+localStorage.setItem('trip_check_'+index,item.checked);
+}
+});
+}
+
+// ===============================
+// LOAD DATA SAAT WEB DIBUKA
+// ===============================
+
+function loadData(){
+const allInputs=document.querySelectorAll('input, select');
+
+allInputs.forEach((item,index)=>{
+
+if(item.type==='checkbox'){
+const checked=localStorage.getItem('trip_check_'+index)==='true';
+item.checked=checked;
+}
+else{
+const saved=localStorage.getItem('trip_'+index);
+
+if(saved!==null){
+item.value=saved;
+}
+}
+});
+
+updateProgress();
+}
+
+// ===============================
+// AUTO SAVE SAAT INPUT BERUBAH
+// ===============================
+
+document.addEventListener('input',saveData);
+document.addEventListener('change',saveData);
+
+// LOAD DATA
+window.onload=loadData;
+}
+
+function resetAllData(){
+
+const confirmReset = confirm(
+'Yakin ingin menghapus semua data trip?'
+);
+
+if(confirmReset){
+
+// hapus localStorage
+localStorage.clear();
+
+// reset semua input
+const allInputs = document.querySelectorAll('input, select');
+
+allInputs.forEach(item=>{
+
+if(item.type==='checkbox'){
+item.checked=false;
+}
+else{
+item.value='';
+}
+});
+
+// reset progress
+updateProgress();
+
+// reset detail pantai
+document.getElementById('pantaiDetail').innerHTML='';
+
+// reset ringkasan
+document.getElementById('summaryBox').innerHTML=
+'✨ Ringkasan trip akan muncul di sini setelah tombol ditekan.';
+
+// reset progress text
+document.getElementById('progress').style.width='0%';
+document.getElementById('progressText').innerText='0% selesai';
+
+// hapus dynamic content
+document.getElementById('dynamicExpense').innerHTML='';
+document.getElementById('shoppingContainer').innerHTML='';
+
+// reset counter
+expenseCount=0;
+shoppingCount=0;
+
+alert('✅ Semua data berhasil direset');
+}
+}
+</script>
+
+</body>
+</html>
